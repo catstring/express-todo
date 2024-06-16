@@ -5,7 +5,7 @@ exports.getTasks = async (req, res) => {
     try {
         const tasks = await Task.find({ is_completed: false }).sort({ createdAt: -1 })
         const completedTasks = await Task.find({ is_completed: true}).sort({ createdAt: -1 })
-        res.render('index', { tasks, completedTasks, user: req.user})
+        res.render('index', { tasks, completedTasks, user: req.user })
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
@@ -19,7 +19,7 @@ exports.createTask = async (req, res) => {
             displayName: req.isAuthenticated() ? req.user.displayName : 'Guest'
         });
         await task.save();
-        res.redirect('/');
+        res.json({ task })
     } catch (error) {
         res.status(500).json({message: error.message})
     }
@@ -42,7 +42,7 @@ exports.editTask = async (req, res) => {
         }
 
         const updatedTask = await Task.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
-        res.redirect('/');
+        res.json({ task: updatedTask })
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -56,7 +56,7 @@ exports.deleteTask = async (req, res) => {
             return res.status(403).json({ message: 'You are not authorized to delete this task' });
         }
         await Task.findByIdAndDelete(id)
-        res.redirect('/');
+        res.json({ message: 'Task deleted successfully' })
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

@@ -1,20 +1,20 @@
-<ul>
+<ul id="completedTaskList">
     <% completedTasks.forEach(task => { %>
-        <li>
+        <li id="task-<%= task._id %>">
             <span><%- task.is_completed ? '&#x2611;' : '&#x2610;' %></span>
             <span>[<%= task.name %>]</span>
             <span>---</span>
             <span><%= task.displayName %></span>
 
             <!-- Form to update the is_completed status -->
-            <form action="/tasks/<%= task._id %>?_method=PUT" method="POST" style="display:inline;">
+            <form class="updateTaskForm" data-id="<%= task._id %>" style="display:inline;">
                 <input type="hidden" name="is_completed" value="<%= !task.is_completed %>">
                 <span> --- </span>
                 <button type="submit"><%= task.is_completed ? 'Redo' : 'Done' %></button>
             </form>
 
             <!-- Form to delete the task -->
-            <form action="/tasks/<%= task._id %>?_method=DELETE" method="POST" style="display:inline;">
+            <form class="deleteTaskForm" data-id="<%= task._id %>" style="display:inline;">
                 <span> - </span>
                 <button type="submit">X</button>
             </form>

@@ -1,0 +1,93 @@
+<script>
+    $(document).ready(function () {
+        // Create task
+        $('#createTaskForm').submit(function (e) {
+            e.preventDefault();
+            const data = $(this).serialize();
+            $.ajax({
+                type: 'POST',
+                url: '/tasks',
+                data: data,
+                success: function (response) {
+                    if (response.task) {
+                        $('#taskList').append(`
+                            <li id="task-${response.task._id}">
+                                <span>${response.task.is_completed ? '&#x2611;' : '&#x2610;'}</span>
+                                <span>[${response.task.name}]</span>
+                                <span>---</span>
+                                <span>${response.task.displayName}</span>
+
+                                <!-- Form to update the is_completed status -->
+                                <form class="updateTaskForm" data-id="${response.task._id}" style="display:inline;">
+                                    <span> --- </span>
+                                    <input type="hidden" name="is_completed" value="${!response.task.is_completed}">
+                                    <button type="submit">${response.task.is_completed ? 'Redo' : 'Done'}</button>
+                                </form>
+
+                                <!-- Form to delete the task -->
+                                <form class="deleteTaskForm" data-id="${response.task._id}" style="display:inline;">
+                                    <span> - </span>
+                                    <button type="submit">X</button>
+                                </form>
+                            </li>
+                        `);
+                        $('#createTaskForm')[0].reset(); // Reset the form
+                    } else {
+                        console.error('Task not found in response:', response);
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+
+        // Update task
+        $(document).on('submit', '.updateTaskForm', function (e) {
+            e.preventDefault();
+            const id = $(this).data('id');
+            const data = $(this).serialize();
+            $.ajax({
+                type: 'PUT',
+                url: `/tasks/${id}`,
+                data: data,
+                success: function (response) {
+                    if (response.task) {
+                        const taskItem = $(`#task-${id}`);
+                        taskItem.find('span:first').html(response.task.is_completed ? '&#x2611;' : '&#x2610;');
+                        taskItem.find('.updateTaskForm input[name="is_completed"]').val(!response.task.is_completed);
+                        taskItem.find('.updateTaskForm button').text(response.task.is_completed ? 'Redo' : 'Done');
+
+                        // Move task to the appropriate list if its completion status changed
+                        if (response.task.is_completed) {
+                            $('#completedTaskList').append(taskItem);
+                        } else {
+                            $('#taskList').append(taskItem);
+                        }
+                    } else {
+                        console.error('Task not found in response:', response);
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+
+        // Delete task
+        $(document).on('submit', '.deleteTaskForm', function (e) {
+            e.preventDefault();
+            const id = $(this).data('id');
+            $.ajax({
+                type: 'DELETE',
+                url: `/tasks/${id}`,
+                success: function (response) {
+                    $(`#task-${id}`).remove();
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+    });
+</script>
