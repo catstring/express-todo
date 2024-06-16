@@ -19,6 +19,7 @@ mongoose.connect("mongodb+srv://toddmctsai:Fo1zwAgUqPvCmPbY@cluster0.ohtvgui.mon
 // Middleware to parse request body
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.json())
+app.use(express.static('public'))
 app.use(methodOverride('_method'))
 
 // Session middleware
