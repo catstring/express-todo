@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task List</title>
+</head>
+<body>
+    <h1>Task List</h1>
+    <% if (user) { %>
+        <h1>Hello <%= user.displayName %></h1>
+        <p><%= user.email %> <%= user.googleId %></p>
+        <a href="/auth/logout">Logout</a>
+    <% } else { %>
+        <h1>Welcome to the app</h1>
+        <a href="/auth/google">Login with Google</a>
+    <% } %>
+
+    <!-- Form to create a new task -->
+    <form action="/tasks" method="POST">
+        <input type="text" name="name" placeholder="Task name" required>
+        <button type="submit">Create Task</button>
+    </form>
+
+    <!-- List of tasks -->
+    <ul>
+        <% tasks.forEach(task => { %>
+            <li>
+                <span><%- task.is_completed ? '&#x2611;' : '&#x2610;' %></span>
+                <span>[<%= task.name %>]</span>
+                <span>---</span>
+                <span><%= task.displayName %></span>
+
+                <!-- Form to update the is_completed status -->
+                <form action="/tasks/<%= task._id %>?_method=PUT" method="POST" style="display:inline;">
+                    <span> --- </span>
+                    <input type="hidden" name="is_completed" value="<%= !task.is_completed %>">
+                    <button type="submit"><%= task.is_completed ? 'Redo' : 'Done' %></button>
+                </form>
+
+                <!-- Form to delete the task -->
+                <form action="/tasks/<%= task._id %>?_method=DELETE" method="POST" style="display:inline;">
+                    <span> - </span>
+                    <button type="submit">X</button>
+                </form>
+            </li>
+        <% }); %>
+    </ul>
+
+    <ul>
+        <% completedTasks.forEach(task => { %>
+            <li>
+                <span><%- task.is_completed ? '&#x2611;' : '&#x2610;' %></span>
+                <span>[<%= task.name %>]</span>
+                <span>---</span>
+                <span><%= task.displayName %></span>
+
+                <!-- Form to update the is_completed status -->
+                <form action="/tasks/<%= task._id %>?_method=PUT" method="POST" style="display:inline;">
+                    <input type="hidden" name="is_completed" value="<%= !task.is_completed %>">
+                    <span> --- </span>
+                    <button type="submit"><%= task.is_completed ? 'Redo' : 'Done' %></button>
+                </form>
+
+                <!-- Form to delete the task -->
+                <form action="/tasks/<%= task._id %>?_method=DELETE" method="POST" style="display:inline;">
+                    <span> - </span>
+                    <button type="submit">X</button>
+                </form>
+            </li>
+        <% }); %>
+    </ul>
+
+    <!-- Include method override script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/method-override/3.0.0/method-override.min.js"></script>
+</body>
+</html>
